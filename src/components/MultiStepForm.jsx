@@ -1,41 +1,29 @@
-// src/components/MultiStepForm.js
-import React, { useState } from 'react';
-import AppDetails from './AppDetails';
-import RepositoryConfiguration from './RepositoryConfiguration';
-import BuildSettings from './BuildSettings';
-import ReviewAndSubmit from './ReviewAndSubmit';
+import React from "react";
+import { Route, Router, Routes, Switch, useRouteMatch } from "react-router-dom";
+import styled from "styled-components";
+import Step1 from "./Step1";
+import Step2 from "./Step2";
+import Step3 from "./Step3";
+import Step4 from "./Step4";
+
+const FormContainer = styled.div`
+  flex: 1;
+  padding: 20px;
+`;
 
 const MultiStepForm = () => {
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    repoUrl: '',
-    branch: '',
-    buildCommands: '',
-    envVariables: '',
-  });
+  // const { path } = useRouteMatch();
 
-  const nextStep = () => setStep(step + 1);
-  const prevStep = () => setStep(step - 1);
-
-  const handleSubmit = () => {
-    // Handle form submission
-    console.log('Form Submitted', formData);
-  };
-
-  switch (step) {
-    case 1:
-      return <AppDetails nextStep={nextStep} formData={formData} setFormData={setFormData} />;
-    case 2:
-      return <RepositoryConfiguration nextStep={nextStep} prevStep={prevStep} formData={formData} setFormData={setFormData} />;
-    case 3:
-      return <BuildSettings nextStep={nextStep} prevStep={prevStep} formData={formData} setFormData={setFormData} />;
-    case 4:
-      return <ReviewAndSubmit prevStep={prevStep} formData={formData} handleSubmit={handleSubmit} />;
-    default:
-      return <AppDetails nextStep={nextStep} formData={formData} setFormData={setFormData} />;
-  }
+  return (
+    <FormContainer>
+      <Routes>
+        <Route exact path={`/step1`} element={<Step1/>} />
+        <Route path={`/step2`} element={<Step2/>} />
+        <Route path={`/step3`} element={<Step3/>} />
+        <Route path={`/step4`} element={<Step4/>} />
+      </Routes>
+    </FormContainer>
+  );
 };
 
 export default MultiStepForm;
