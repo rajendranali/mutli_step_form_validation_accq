@@ -1,10 +1,42 @@
 import React from 'react';
-import { Formik, Form, Field, FieldArray } from 'formik';
-import * as Yup from 'yup';
+import { useSelector, useDispatch } from 'react-redux';
+import { Formik, Form } from 'formik';
 import styled from 'styled-components';
+import * as Yup from 'yup';
+
+import { SubmitButton } from './Step1';
+import { saveFormData, setCompletedStep, setCurrentStep } from '../Redux/action/action';
+
+// Styled components
+const Container = styled.div`
+  max-width: 800px;
+//   margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+`;
 
 const ReviewContainer = styled.div`
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  /* Removed border and set padding */
+`;
+
+const SectionTitle = styled.h3`
+  font-size: 1.2em;
+  margin-bottom: 10px;
+`;
+
+const SectionContent = styled.p`
+  margin: 5px 0;
+  color: #4F1787;
+  text-align: left; /* Ensure left alignment */
+`;
+
+const ButtonContainer = styled.div`
+  margin-top: 20px;
+  display: flex;
+//   justify-content: space-between;
 `;
 
 const validationSchema = Yup.object({
@@ -17,43 +49,62 @@ const validationSchema = Yup.object({
 });
 
 const Step4 = () => {
+  const dispatch = useDispatch();
+  const formData = useSelector((state) => ({
+    ...state.form.step1,
+    ...state.form.step2,
+    ...state.form.step3,
+  }));
+
+  const handleSubmit = (values) => {
+    dispatch(saveFormData(values)); 
+    dispatch(setCompletedStep(4));
+    alert('Form submitted and data saved: ' + JSON.stringify(values, null, 2));
+  };
+
   return (
-    <Formik
-      initialValues={{
-        appName: '',
-        appDescription: '',
-        repoUrl: '',
-        branch: '',
-        buildCommands: '',
-        envVariables: '',
-      }}
-      validationSchema={validationSchema}
-      onSubmit={(values) => {
-        alert('Form submitted: ' + JSON.stringify(values, null, 2));
-      }}
-    >
-      {({ values }) => (
-        <Form>
-          <h2>Review and Submit</h2>
-          <ReviewContainer>
-            <h3>App Details</h3>
-            <p><strong>App Name:</strong> {values.appName}</p>
-            <p><strong>App Description:</strong> {values.appDescription}</p>
-          </ReviewContainer>
-          <ReviewContainer>
-            <h3>Repository Configuration</h3>
-            <p><strong>Repository URL:</strong> {values.repoUrl}</p>
-            <p><strong>Branch:</strong> {values.branch}</p>
-          </ReviewContainer>
-          <ReviewContainer>
-            <h3>Build Settings</h3>
-            <p><strong>Build Commands:</strong> {values.buildCommands}</p>
-            <p><strong>Environment Variables:</strong> {values.envVariables}</p>
-          </ReviewContainer>
-          <button type="submit">Submit All</button>
-        </Form>
-      )}
-    </Formik>
+    <Container>
+      <Formik
+        initialValues={formData}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+        enableReinitialize={true}
+      >
+        {() => (
+          <Form>
+            <h2 style={{ textAlign: 'left' }}>Review and Submit</h2> {/* Changed alignment */}
+            <ReviewContainer>
+              <SectionTitle>App Details</SectionTitle>
+              <SectionContent><strong >App Name:</strong> {formData.appName}</SectionContent>
+              <SectionContent><strong>App Description:</strong> {formData.appDescription}</SectionContent>
+            </ReviewContainer>
+            <ReviewContainer>
+              <SectionTitle>Repository Configuration</SectionTitle>
+              <SectionContent><strong>Repository URL:</strong> {formData.repoUrl}</SectionContent>
+              <SectionContent><strong>Branch:</strong> {formData.branch}</SectionContent>
+            </ReviewContainer>
+            <ReviewContainer>
+              <SectionTitle>Build Settings</SectionTitle>
+              <SectionContent><strong>Build Commands:</strong> {formData.buildCommands}</SectionContent>
+              <SectionContent><strong>Environment Variables:</strong> {formData.envVariables}</SectionContent>
+            </ReviewContainer>
+            <ButtonContainer>
+              <SubmitButton
+                type="button"
+                onClick={() => {
+                  dispatch(setCurrentStep(3));
+                }}
+              >
+                Previous
+              </SubmitButton>
+              <SubmitButton type="submit">
+                Submit All
+              </SubmitButton>
+            </ButtonContainer>
+          </Form>
+        )}
+      </Formik>
+    </Container>
   );
 };
 
